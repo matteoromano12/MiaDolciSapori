@@ -39,3 +39,62 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
     }
   });
 });
+
+(function() {
+  var dateInput = document.getElementById('b-date');
+  if (dateInput) {
+    dateInput.min = new Date().toISOString().split('T')[0];
+  }
+})();
+
+function submitBooking() {
+  var name   = (document.getElementById('b-name').value   || '').trim();
+  var phone  = (document.getElementById('b-phone').value  || '').trim();
+  var email  = (document.getElementById('b-email').value  || '').trim();
+  var guests = (document.getElementById('b-guests').value || '').trim();
+  var date   = (document.getElementById('b-date').value   || '').trim();
+  var time   = (document.getElementById('b-time').value   || '').trim();
+  var notes  = (document.getElementById('b-notes').value  || '').trim();
+
+  if (!name || !phone || !guests || !date || !time) {
+    alert('Compila tutti i campi obbligatori (*).');
+    return;
+  }
+
+  var btn = document.getElementById('booking-submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Invio in corso...';
+
+  var id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  var booking = {
+    id:        id,
+    name:      name,
+    phone:     phone,
+    email:     email,
+    guests:    guests,
+    date:      date,
+    time:      time,
+    notes:     notes,
+    status:    'new',
+    createdAt: new Date().toISOString()
+  };
+
+  var existing = [];
+  try {
+    existing = JSON.parse(localStorage.getItem('mf_bookings') || '[]');
+  } catch(e) { existing = []; }
+  existing.push(booking);
+  localStorage.setItem('mf_bookings', JSON.stringify(existing));
+
+  ['b-name','b-phone','b-email','b-guests','b-date','b-time','b-notes']
+    .forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+
+  document.getElementById('booking-success').style.display = 'flex';
+  document.getElementById('booking-error').style.display   = 'none';
+
+  btn.disabled    = false;
+  btn.textContent = 'Prenota il tuo tavolo →';
+}
