@@ -17,7 +17,7 @@
     <div class="login-logo">MIA <span>FOOD</span></div>
     <div class="login-sub">Area Amministrativa · Prenotazioni</div>
     <label for="pwd">Password</label>
-    <input type="password" id="pwd" placeholder="••••••••" onkeydown="if(event.key==='Enter') doLogin()">
+    <input type="password" id="pwd" placeholder="••••••••">
     <button class="btn-login" onclick="doLogin()">Accedi</button>
     <div class="login-error" id="login-error">Password non corretta. Riprova.</div>
   </div>
@@ -31,7 +31,15 @@
       <div class="admin-logo-sub">Pannello Prenotazioni</div>
     </div>
     <div class="header-right">
-      <span id="today-label" style="font-size:.82rem;color:rgba(253,250,246,.55);"></span>
+      <div class="day-nav">
+        <button class="day-nav-btn" onclick="prevDay()">‹</button>
+        <div class="day-nav-center">
+          <div class="day-nav-label" id="day-label">Oggi</div>
+          <div class="day-nav-full" id="day-full"></div>
+        </div>
+        <button class="day-nav-btn" onclick="nextDay()">›</button>
+        <button class="day-nav-today" onclick="goToday()">Oggi</button>
+      </div>
       <button class="btn-logout" onclick="doLogout()">Esci</button>
     </div>
   </header>
@@ -39,9 +47,9 @@
   <main class="admin-main">
 
     <div class="stats-row" id="stats-row">
-      <div class="stat-card"><div class="s-lbl">Totale</div><div class="s-val" id="s-total">–</div></div>
-      <div class="stat-card"><div class="s-lbl">Nuove</div><div class="s-val amber" id="s-new">–</div></div>
-      <div class="stat-card"><div class="s-lbl">Confermate</div><div class="s-val green" id="s-confirmed">–</div></div>
+      <div class="stat-card"><div class="s-lbl">Prenotazioni</div><div class="s-val" id="s-total">–</div></div>
+      <div class="stat-card"><div class="s-lbl">In attesa</div><div class="s-val amber" id="s-new">–</div></div>
+      <div class="stat-card"><div class="s-lbl">Arrivati</div><div class="s-val green" id="s-confirmed">–</div></div>
       <div class="stat-card"><div class="s-lbl">Coperti attesi</div><div class="s-val red" id="s-guests">–</div></div>
     </div>
 
@@ -52,16 +60,10 @@
       </div>
       <select id="filter-status" onchange="renderTable()">
         <option value="">Tutti gli stati</option>
-        <option value="new">Nuove</option>
-        <option value="confirmed">Confermate</option>
+        <option value="new">In attesa</option>
+        <option value="confirmed">Arrivati</option>
         <option value="cancelled">Cancellate</option>
       </select>
-      <div class="toolbar-date">
-        <label>Dal</label>
-        <input type="date" id="filter-date-from" onchange="renderTable()">
-        <label>Al</label>
-        <input type="date" id="filter-date-to" onchange="renderTable()">
-      </div>
       <div class="spacer"></div>
       <button class="btn-export" onclick="exportCSV()">⬇ Esporta CSV</button>
     </div>
@@ -70,18 +72,19 @@
       <div class="table-scroll">
         <table id="bookings-table">
           <thead>
-          <tr>
-            <th>Cliente</th>
-            <th>Data</th>
-            <th>Orario</th>
-            <th>Pers.</th>
-            <th>Stato</th>
-            <th>Note</th>
-            <th>Azioni</th>
-          </tr>
+            <tr>
+              <th>Cliente</th>
+              <th>Data</th>
+              <th>Orario</th>
+              <th>Pers.</th>
+              <th>Stato</th>
+              <th>Note</th>
+              <th>Inviata il</th>
+              <th>Azioni</th>
+            </tr>
           </thead>
           <tbody id="table-body">
-          <tr><td colspan="7"><div class="empty-state"><div class="icon">📋</div><p>Nessuna prenotazione ancora.</p></div></td></tr>
+            <tr><td colspan="8"><div class="empty-state"><div class="icon">📋</div><p>Nessuna prenotazione ancora.</p></div></td></tr>
           </tbody>
         </table>
       </div>
