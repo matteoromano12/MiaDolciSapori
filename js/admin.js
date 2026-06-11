@@ -3,19 +3,26 @@ var API_URL = 'https://miafood-api.matteoriserva0411.workers.dev';
 var bookings = [];
 var currentDay = todayStr();
 
+function dateToStr(d) {
+  return d.getFullYear() + '-' +
+    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+    String(d.getDate()).padStart(2, '0');
+}
+
 function todayStr() {
-  return new Date().toISOString().split('T')[0];
+  return dateToStr(new Date());
 }
 
 function formatDayLabel(dateStr) {
-  var d = new Date(dateStr + 'T00:00:00');
+  var parts = dateStr.split('-');
+  var d = new Date(+parts[0], +parts[1] - 1, +parts[2]);
   var today = todayStr();
   var yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
-  var yesterdayStr = yesterday.toISOString().split('T')[0];
+  var yesterdayStr = dateToStr(yesterday);
   var tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
-  var tomorrowStr = tomorrow.toISOString().split('T')[0];
+  var tomorrowStr = dateToStr(tomorrow);
 
   if (dateStr === today) return 'Oggi';
   if (dateStr === yesterdayStr) return 'Ieri';
@@ -75,25 +82,29 @@ function init() {
 
 function renderDayNav() {
   document.getElementById('day-label').textContent = formatDayLabel(currentDay);
-  var fullDate = new Date(currentDay + 'T00:00:00').toLocaleDateString('it-IT', {
+  var parts = currentDay.split('-');
+  var d = new Date(+parts[0], +parts[1] - 1, +parts[2]);
+  var fullDate = d.toLocaleDateString('it-IT', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
   });
   document.getElementById('day-full').textContent = fullDate;
 }
 
 function prevDay() {
-  var d = new Date(currentDay + 'T00:00:00');
+  var parts = currentDay.split('-');
+  var d = new Date(+parts[0], +parts[1] - 1, +parts[2]);
   d.setDate(d.getDate() - 1);
-  currentDay = d.toISOString().split('T')[0];
+  currentDay = dateToStr(d);
   renderDayNav();
   renderStats();
   renderTable();
 }
 
 function nextDay() {
-  var d = new Date(currentDay + 'T00:00:00');
+  var parts = currentDay.split('-');
+  var d = new Date(+parts[0], +parts[1] - 1, +parts[2]);
   d.setDate(d.getDate() + 1);
-  currentDay = d.toISOString().split('T')[0];
+  currentDay = dateToStr(d);
   renderDayNav();
   renderStats();
   renderTable();
@@ -174,7 +185,8 @@ function renderTable() {
   };
 
   var rows = filtered.map(function (b) {
-    var d        = new Date(b.date + 'T00:00:00');
+    var parts    = b.date.split('-');
+    var d        = new Date(+parts[0], +parts[1] - 1, +parts[2]);
     var dateMain = d.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' });
     var dateDay  = d.toLocaleDateString('it-IT', { weekday: 'long' });
     var notes    = b.notes ? b.notes.substring(0, 30) + (b.notes.length > 30 ? '…' : '') : '—';
@@ -246,7 +258,8 @@ function openDetail(id) {
   var b = bookings.find(function (x) { return x.id === id; });
   if (!b) return;
 
-  var d        = new Date(b.date + 'T00:00:00');
+  var parts    = b.date.split('-');
+  var d        = new Date(+parts[0], +parts[1] - 1, +parts[2]);
   var dateStr  = d.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   var createdStr = new Date(b.created_at).toLocaleString('it-IT');
 
