@@ -1,5 +1,5 @@
 var API_URL = 'https://miafood-api.matteoriserva0411.workers.dev';
-
+//^=^
 var bookings = [];
 var adminToken = null;
 
