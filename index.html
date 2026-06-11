@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MIA FOOD — Pizzeria e Colazione a Fagnano Olona</title>
-  <meta name="description" content="MIA FOOD: pizzeria, colazione, pane fresco e caffè a Fagnano Olona. Pizza buona, prezzi onesti, da asporto. Chiama 0331 155 2818."/>
-  <meta name="keywords" content="pizzeria Fagnano Olona, colazione Fagnano Olona, pizza da asporto Fagnano Olona, pane fresco Fagnano Olona, MIA FOOD"/>
-  <meta property="og:title" content="MIA FOOD — Pizzeria e Colazione a Fagnano Olona"/>
+  <title>MIA DOLCI SAPORI — Pizzeria e Colazione a Fagnano Olona</title>
+  <meta name="description" content="MIA DOLCI SAPORI: pizzeria, colazione, pane fresco e caffè a Fagnano Olona. Pizza buona, prezzi onesti, da asporto. Chiama 0331 155 2818."/>
+  <meta name="keywords" content="pizzeria Fagnano Olona, colazione Fagnano Olona, pizza da asporto Fagnano Olona, pane fresco Fagnano Olona, MIA FOOD, MIA DOLCI SAPORI"/>
+  <meta property="og:title" content="MIA DOLCI SAPORI — Pizzeria e Colazione a Fagnano Olona"/>
   <meta property="og:description" content="Pizza, colazione e pane fresco nel cuore di Fagnano Olona. Vieni a trovarci o chiama per l'asporto."/>
   <meta property="og:type" content="restaurant"/>
   <meta property="og:image" content=""/> <!-- AGGIUNGERE FOTO -->
@@ -18,7 +18,7 @@
     {
       "@context": "https://schema.org",
       "@type": "Restaurant",
-      "name": "MIA FOOD",
+      "name": "MIA DOLCI SAPORI",
       "servesCuisine": ["Pizza","Italian","Breakfast","Bakery"],
       "priceRange": "€",
       "telephone": "+390331552818",
@@ -376,6 +376,139 @@
   </div>
 </section>
 
+<section id="prenotazioni" class="section section-bg">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="eyebrow">Riserva il tuo posto</span>
+      <h2>Prenota da <span>MIA FOOD</span>.</h2>
+      <p style="margin-top:.75rem;color:var(--muted);font-size:1rem;">
+        Compila il modulo e ti confermiamo entro breve. Per urgenze chiama il <a href="tel:+390331552818" style="color:var(--red);font-weight:600">0331 155 2818</a>.
+      </p>
+    </div>
+
+    <div class="booking-form-wrap reveal">
+      <div class="booking-form-grid">
+
+        <div class="booking-info">
+          <div class="booking-info-item">
+            <div class="booking-info-icon">🕒</div>
+            <div>
+              <div class="booking-info-lbl">Orari disponibili</div>
+              <div class="booking-info-val">Pranzo: 11:45 – 14:30<br>Cena: 18:30 – 23:00</div>
+            </div>
+          </div>
+          <div class="booking-info-item">
+            <div class="booking-info-icon">📍</div>
+            <div>
+              <div class="booking-info-lbl">Dove siamo</div>
+              <div class="booking-info-val">Via L. Cadorna 26<br>Fagnano Olona (VA)</div>
+            </div>
+          </div>
+          <div class="booking-info-item">
+            <div class="booking-info-icon">💬</div>
+            <div>
+              <div class="booking-info-lbl">Preferisci WhatsApp?</div>
+              <div class="booking-info-val">
+                <a href="https://wa.me/393473941917?text=Ciao%20MIA%20FOOD!%20Vorrei%20prenotare%20un%20tavolo..." target="_blank" rel="noopener" style="color:var(--red);font-weight:600">Scrivici qui →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- COLONNA DESTRA: form -->
+        <div class="booking-form-card">
+          <div class="booking-form-inner">
+            <div class="bfg bfg-2">
+              <div class="bf-group">
+                <label for="b-name">Nome e cognome *</label>
+                <input type="text" id="b-name" name="name" placeholder="Mario Rossi" autocomplete="name" required>
+              </div>
+              <div class="bf-group">
+                <label for="b-phone">Telefono *</label>
+                <input type="tel" id="b-phone" name="phone" placeholder="333 123 4567" autocomplete="tel" required>
+              </div>
+            </div>
+            <div class="bfg bfg-2">
+              <div class="bf-group">
+                <label for="b-email">Email</label>
+                <input type="email" id="b-email" name="email" placeholder="mario@email.com" autocomplete="email">
+              </div>
+              <div class="bf-group">
+                <label for="b-guests">Numero di persone *</label>
+                <select id="b-guests" name="guests" required>
+                  <option value="">Seleziona...</option>
+                  <option value="1">1 persona</option>
+                  <option value="2">2 persone</option>
+                  <option value="3">3 persone</option>
+                  <option value="4">4 persone</option>
+                  <option value="5">5 persone</option>
+                  <option value="6">6 persone</option>
+                  <option value="7">7 persone</option>
+                  <option value="8">8+ persone</option>
+                </select>
+              </div>
+            </div>
+            <div class="bfg bfg-2">
+              <div class="bf-group">
+                <label for="b-date">Data *</label>
+                <input type="date" id="b-date" name="date" required>
+              </div>
+              <div class="bf-group">
+                <label for="b-time">Orario *</label>
+                <select id="b-time" name="time" required>
+                  <option value="">Seleziona...</option>
+                  <optgroup label="Pranzo">
+                    <option value="12:00">12:00</option>
+                    <option value="12:30">12:30</option>
+                    <option value="13:00">13:00</option>
+                    <option value="13:30">13:30</option>
+                  </optgroup>
+                  <optgroup label="Cena">
+                    <option value="19:00">19:00</option>
+                    <option value="19:30">19:30</option>
+                    <option value="20:00">20:00</option>
+                    <option value="20:30">20:30</option>
+                    <option value="21:00">21:00</option>
+                    <option value="21:30">21:30</option>
+                    <option value="22:00">22:00</option>
+                  </optgroup>
+                </select>
+              </div>
+            </div>
+            <div class="bfg bfg-1">
+              <div class="bf-group">
+                <label for="b-notes">Note (allergie, richieste speciali...)</label>
+                <textarea id="b-notes" name="notes" placeholder="Es. seggiolone per bambino, allergia al glutine..." rows="3"></textarea>
+              </div>
+            </div>
+
+            <button type="button" class="btn btn-primary booking-submit-btn" id="booking-submit-btn" onclick="submitBooking()">
+              Prenota il tuo tavolo →
+            </button>
+
+            <!-- Messaggio di successo -->
+            <div class="booking-success" id="booking-success" style="display:none;">
+              <span class="booking-success-icon">✅</span>
+              <div>
+                <strong>Prenotazione ricevuta!</strong><br>
+                Ti contatteremo al numero fornito per confermare. A presto da MIA FOOD!
+              </div>
+            </div>
+
+            <!-- Messaggio di errore -->
+            <div class="booking-error" id="booking-error" style="display:none;">
+              ⚠️ Si è verificato un errore. Riprova o chiamaci al <a href="tel:+390331552818">0331 155 2818</a>.
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
 <section id="contatti" class="section">
   <div class="container">
     <div class="section-header reveal">
@@ -415,7 +548,7 @@
             <div class="info-lbl">WhatsApp</div>
             <div class="info-val">
               <a
-                href="https://wa.me/390331552818?text=Ciao%20MIA%20FOOD!%20Vorrei%20ordinare..."
+                href="https://wa.me/393473941917?text=Ciao%20MIA%20FOOD!%20Vorrei%20ordinare..."
                 target="_blank"
                 rel="noopener"
               >Ordina su WhatsApp</a>
@@ -442,7 +575,7 @@
         <div class="contatti-ctas">
           <a href="tel:+390331552818" class="btn btn-primary">📞 Chiama ora</a>
           <a
-            href="https://wa.me/390331552818?text=Ciao%20MIA%20FOOD!%20Vorrei%20ordinare..."
+            href="https://wa.me/393473941917?text=Ciao%20MIA%20FOOD!%20Vorrei%20ordinare..."
             target="_blank"
             rel="noopener"
             class="btn btn-wa"
@@ -470,7 +603,7 @@
     </div>
     <div class="footer-links">
       <a
-        href="https://wa.me/390331552818?text=Ciao%20MIA%20FOOD!%20Vorrei%20ordinare..."
+        href="https://wa.me/393473941917?text=Ciao%20MIA%20FOOD!%20Vorrei%20ordinare..."
         target="_blank"
         rel="noopener"
         aria-label="WhatsApp"
@@ -483,14 +616,17 @@
         aria-label="Mappa"
       >📍</a>
     </div>
-    <div class="footer-copy">© 2026 MIA FOOD. Tutti i diritti riservati.</div>
+    <div class="footer-copy">
+      © 2026 MIA FOOD. Tutti i diritti riservati.<br>
+      <a href="admin.html">Area Amministrativa</a>
+    </div>
   </div>
 </footer>
 
 <div class="mobile-bar">
   <a href="tel:+390331552818" class="btn btn-primary">📞 Chiama</a>
   <a
-    href="https://wa.me/390331552818?text=Ciao%20MIA%20FOOD!%20Vorrei%20ordinare..."
+    href="https://wa.me/393473941917?text=Ciao%20MIA%20FOOD!%20Vorrei%20ordinare..."
     target="_blank"
     rel="noopener"
     class="btn btn-wa-mob"
