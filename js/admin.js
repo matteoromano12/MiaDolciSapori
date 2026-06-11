@@ -1,7 +1,27 @@
 var API_URL = 'https://miafood-api.matteoriserva0411.workers.dev';
-//^=^
+
 var bookings = [];
-var adminToken = null;
+var currentDay = todayStr();
+
+function todayStr() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function formatDayLabel(dateStr) {
+  var d = new Date(dateStr + 'T00:00:00');
+  var today = todayStr();
+  var yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  var yesterdayStr = yesterday.toISOString().split('T')[0];
+  var tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  var tomorrowStr = tomorrow.toISOString().split('T')[0];
+
+  if (dateStr === today) return 'Oggi';
+  if (dateStr === yesterdayStr) return 'Ieri';
+  if (dateStr === tomorrowStr) return 'Domani';
+  return d.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' });
+}
 
 function getToken() {
   return sessionStorage.getItem('mf_token');
@@ -43,10 +63,7 @@ if (getToken()) {
 }
 
 function init() {
-  var now = new Date();
-  document.getElementById('today-label').textContent =
-    now.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-
+  renderDayNav();
   loadBookings();
 
   setInterval(function () {
@@ -54,6 +71,43 @@ function init() {
     document.getElementById('table-updated').textContent =
       'Aggiornato alle ' + new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
   }, 30000);
+}
+
+function renderDayNav() {
+  document.getElementById('day-label').textContent = formatDayLabel(currentDay);
+  var fullDate = new Date(currentDay + 'T00:00:00').toLocaleDateString('it-IT', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+  });
+  document.getElementById('day-full').textContent = fullDate;
+}
+
+function prevDay() {
+  var d = new Date(currentDay + 'T00:00:00');
+  d.setDate(d.getDate() - 1);
+  currentDay = d.toISOString().split('T')[0];
+  renderDayNav();
+  renderStats();
+  renderTable();
+}
+
+function nextDay() {
+  var d = new Date(currentDay + 'T00:00:00');
+  d.setDate(d.getDate() + 1);
+  currentDay = d.toISOString().split('T')[0];
+  renderDayNav();
+  renderStats();
+  renderTable();
+}
+
+function goToday() {
+  currentDay = todayStr();
+  renderDayNav();
+  renderStats();
+  renderTable();
+}
+
+function bookingsForDay() {
+  return bookings.filter(function (b) { return b.date === currentDay; });
 }
 
 function loadBookings() {
@@ -73,52 +127,49 @@ function loadBookings() {
     .catch(function (err) {
       if (err.message !== 'unauth') {
         document.getElementById('table-body').innerHTML =
-          '<tr><td colspan="7"><div class="empty-state"><div class="icon">⚠️</div><p>Errore nel caricamento. Riprova.</p></div></td></tr>';
+          '<tr><td colspan="8"><div class="empty-state"><div class="icon">⚠️</div><p>Errore nel caricamento. Riprova.</p></div></td></tr>';
       }
     });
 }
 
 function renderStats() {
-  var total  = bookings.length;
-  var newB   = bookings.filter(function (b) { return b.status === 'new'; }).length;
-  var conf   = bookings.filter(function (b) { return b.status === 'confirmed'; }).length;
-  var guests = bookings
-    .filter(function (b) { return b.status !== 'cancelled'; })
+  var day = bookingsForDay();
+  var total  = day.length;
+  var newB   = day.filter(function (b) { return b.status === 'new'; }).length;
+  var conf   = day.filter(function (b) { return b.status === 'confirmed'; }).length;
+  var attesi = day
+    .filter(function (b) { return b.status === 'new'; })
     .reduce(function (s, b) { return s + (parseInt(b.guests) || 0); }, 0);
 
   document.getElementById('s-total').textContent     = total;
   document.getElementById('s-new').textContent       = newB;
   document.getElementById('s-confirmed').textContent = conf;
-  document.getElementById('s-guests').textContent    = guests;
+  document.getElementById('s-guests').textContent    = attesi;
 }
 
 function renderTable() {
-  var search     = (document.getElementById('search-input').value || '').toLowerCase().trim();
-  var filterS    = document.getElementById('filter-status').value || '';
-  var filterFrom = document.getElementById('filter-date-from').value || '';
-  var filterTo   = document.getElementById('filter-date-to').value || '';
+  var search  = (document.getElementById('search-input').value || '').toLowerCase().trim();
+  var filterS = document.getElementById('filter-status').value || '';
 
-  var filtered = bookings.filter(function (b) {
+  var filtered = bookingsForDay().filter(function (b) {
     var matchSearch = !search ||
       b.name.toLowerCase().includes(search) ||
       (b.phone || '').toLowerCase().includes(search);
     var matchStatus = !filterS || b.status === filterS;
-    var matchFrom   = !filterFrom || b.date >= filterFrom;
-    var matchTo     = !filterTo   || b.date <= filterTo;
-    return matchSearch && matchStatus && matchFrom && matchTo;
+    return matchSearch && matchStatus;
   });
 
   var tbody = document.getElementById('table-body');
 
   if (!filtered.length) {
-    tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="icon">📋</div><p>Nessuna prenotazione trovata.</p></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><div class="icon">📋</div><p>Nessuna prenotazione per questo giorno.</p></div></td></tr>';
     document.getElementById('table-count').textContent = '0 prenotazioni';
     return;
   }
 
   var badgeMap = {
-    new:       '<span class="badge badge-new">🟠 Nuova</span>',
-    confirmed: '<span class="badge badge-confirmed">✅ Confermata</span>',
+    new:       '<span class="badge badge-new">🟠 In attesa</span>',
+    confirmed: '<span class="badge badge-confirmed">✅ Arrivati</span>',
     cancelled: '<span class="badge badge-cancelled">❌ Cancellata</span>',
   };
 
@@ -127,15 +178,16 @@ function renderTable() {
     var dateMain = d.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' });
     var dateDay  = d.toLocaleDateString('it-IT', { weekday: 'long' });
     var notes    = b.notes ? b.notes.substring(0, 30) + (b.notes.length > 30 ? '…' : '') : '—';
+    var sentAt   = new Date(b.created_at).toLocaleString('it-IT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
 
     var actions = '';
-    if (b.status !== 'confirmed') {
-      actions += '<button class="btn-action btn-confirm" onclick="updateStatus(\'' + b.id + '\',\'confirmed\',event)">✓ Conf.</button>';
+    if (b.status === 'new') {
+      actions += '<button class="btn-action btn-confirm" onclick="updateStatus(\'' + b.id + '\',\'confirmed\',event)" title="Segna come arrivati">✓ Arrivati</button>';
     }
     if (b.status !== 'cancelled') {
-      actions += '<button class="btn-action btn-cancel" onclick="updateStatus(\'' + b.id + '\',\'cancelled\',event)">✗</button>';
+      actions += '<button class="btn-action btn-cancel" onclick="updateStatus(\'' + b.id + '\',\'cancelled\',event)" title="Cancella">✗</button>';
     }
-    actions += '<button class="btn-action btn-del" onclick="deleteBooking(\'' + b.id + '\',event)">🗑</button>';
+    actions += '<button class="btn-action btn-del" onclick="deleteBooking(\'' + b.id + '\',event)" title="Elimina">🗑</button>';
 
     return '<tr onclick="openDetail(\'' + b.id + '\')" style="cursor:pointer">' +
       '<td class="td-name"><strong>' + escHtml(b.name) + '</strong><small>' + escHtml(b.phone) + (b.email ? ' · ' + escHtml(b.email) : '') + '</small></td>' +
@@ -144,6 +196,7 @@ function renderTable() {
       '<td style="text-align:center;font-weight:700">' + b.guests + '</td>' +
       '<td>' + (badgeMap[b.status] || b.status) + '</td>' +
       '<td class="notes-cell" title="' + escHtml(b.notes || '') + '">' + escHtml(notes) + '</td>' +
+      '<td style="font-size:.8rem;color:var(--muted);white-space:nowrap">' + sentAt + '</td>' +
       '<td><div class="action-btns" onclick="event.stopPropagation()">' + actions + '</div></td>' +
       '</tr>';
   }).join('');
@@ -193,30 +246,30 @@ function openDetail(id) {
   var b = bookings.find(function (x) { return x.id === id; });
   if (!b) return;
 
-  var d       = new Date(b.date + 'T00:00:00');
-  var dateStr = d.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  var d        = new Date(b.date + 'T00:00:00');
+  var dateStr  = d.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   var createdStr = new Date(b.created_at).toLocaleString('it-IT');
 
   var badgeMap = {
-    new:       '<span class="badge badge-new">🟠 Nuova</span>',
-    confirmed: '<span class="badge badge-confirmed">✅ Confermata</span>',
+    new:       '<span class="badge badge-new">🟠 In attesa</span>',
+    confirmed: '<span class="badge badge-confirmed">✅ Arrivati</span>',
     cancelled: '<span class="badge badge-cancelled">❌ Cancellata</span>',
   };
 
   document.getElementById('modal-name').textContent = b.name;
   document.getElementById('modal-body').innerHTML =
-    row('Telefono',    '<a href="tel:' + b.phone + '" style="color:var(--red);font-weight:600">' + escHtml(b.phone) + '</a>') +
-    row('Email',       b.email ? '<a href="mailto:' + b.email + '" style="color:var(--red)">' + escHtml(b.email) + '</a>' : '—') +
-    row('Data',        dateStr) +
-    row('Orario',      '<strong>' + b.time + '</strong>') +
-    row('Persone',     '<strong>' + b.guests + '</strong>') +
-    row('Stato',       badgeMap[b.status] || b.status) +
-    row('Note',        b.notes ? escHtml(b.notes) : '—') +
-    row('Ricevuta il', createdStr);
+    row('Telefono',      '<a href="tel:' + b.phone + '" style="color:var(--red);font-weight:600">' + escHtml(b.phone) + '</a>') +
+    row('Email',         b.email ? '<a href="mailto:' + b.email + '" style="color:var(--red)">' + escHtml(b.email) + '</a>' : '—') +
+    row('Data',          dateStr) +
+    row('Orario',        '<strong>' + b.time + '</strong>') +
+    row('Persone',       '<strong>' + b.guests + '</strong>') +
+    row('Stato',         badgeMap[b.status] || b.status) +
+    row('Note',          b.notes ? escHtml(b.notes) : '—') +
+    row('Prenotazione inviata', createdStr);
 
   var actions = '';
-  if (b.status !== 'confirmed') {
-    actions += '<button class="btn-action btn-confirm" style="font-size:.88rem;padding:.65rem" onclick="updateStatus(\'' + b.id + '\',\'confirmed\'); closeModalDirect()">✓ Conferma</button>';
+  if (b.status === 'new') {
+    actions += '<button class="btn-action btn-confirm" style="font-size:.88rem;padding:.65rem" onclick="updateStatus(\'' + b.id + '\',\'confirmed\'); closeModalDirect()">✓ Segna arrivati</button>';
   }
   if (b.status !== 'cancelled') {
     actions += '<button class="btn-action btn-cancel" style="font-size:.88rem;padding:.65rem" onclick="updateStatus(\'' + b.id + '\',\'cancelled\'); closeModalDirect()">✗ Cancella</button>';
@@ -238,8 +291,9 @@ function closeModalDirect() {
 }
 
 function exportCSV() {
-  var header = ['ID', 'Nome', 'Telefono', 'Email', 'Data', 'Orario', 'Persone', 'Stato', 'Note', 'Ricevuta il'];
-  var rows = bookings.map(function (b) {
+  var day = bookingsForDay();
+  var header = ['ID', 'Nome', 'Telefono', 'Email', 'Data', 'Orario', 'Persone', 'Stato', 'Note', 'Prenotazione inviata'];
+  var rows = day.map(function (b) {
     return [b.id, b.name, b.phone, b.email || '', b.date, b.time, b.guests, b.status,
       (b.notes || '').replace(/"/g, '""'), b.created_at]
       .map(function (v) { return '"' + v + '"'; }).join(',');
@@ -250,7 +304,7 @@ function exportCSV() {
   var url  = URL.createObjectURL(blob);
   var a    = document.createElement('a');
   a.href     = url;
-  a.download = 'prenotazioni-miafood-' + new Date().toISOString().split('T')[0] + '.csv';
+  a.download = 'prenotazioni-miafood-' + currentDay + '.csv';
   a.click();
   URL.revokeObjectURL(url);
 }
