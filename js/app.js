@@ -1,3 +1,5 @@
+var API_URL = 'https://miafood-api.matteoriserva0411.workers.dev';
+
 (function () {
   const els = document.querySelectorAll('.reveal');
   if (!('IntersectionObserver' in window)) {
@@ -22,7 +24,7 @@
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         navLinks.forEach(a => a.style.color = '');
-        const active = document.querySelector(`nav a[href="#${entry.target.id}"]`);
+        const active = document.querySelector('nav a[href="#' + entry.target.id + '"]');
         if (active) active.style.color = 'var(--red)';
       }
     });
@@ -40,7 +42,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
   });
 });
 
-(function() {
+(function () {
   var dateInput = document.getElementById('b-date');
   if (dateInput) {
     dateInput.min = new Date().toISOString().split('T')[0];
@@ -65,36 +67,29 @@ function submitBooking() {
   btn.disabled = true;
   btn.textContent = 'Invio in corso...';
 
-  var id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-  var booking = {
-    id:        id,
-    name:      name,
-    phone:     phone,
-    email:     email,
-    guests:    guests,
-    date:      date,
-    time:      time,
-    notes:     notes,
-    status:    'new',
-    createdAt: new Date().toISOString()
-  };
-
-  var existing = [];
-  try {
-    existing = JSON.parse(localStorage.getItem('mf_bookings') || '[]');
-  } catch(e) { existing = []; }
-  existing.push(booking);
-  localStorage.setItem('mf_bookings', JSON.stringify(existing));
-
-  ['b-name','b-phone','b-email','b-guests','b-date','b-time','b-notes']
-    .forEach(function(id) {
-      var el = document.getElementById(id);
-      if (el) el.value = '';
+  fetch(API_URL + '/api/bookings', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: name, phone: phone, email: email, guests: guests, date: date, time: time, notes: notes }),
+  })
+    .then(function (res) {
+      if (!res.ok) throw new Error('Errore server');
+      return res.json();
+    })
+    .then(function () {
+      ['b-name', 'b-phone', 'b-email', 'b-guests', 'b-date', 'b-time', 'b-notes'].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+      document.getElementById('booking-success').style.display = 'flex';
+      document.getElementById('booking-error').style.display = 'none';
+    })
+    .catch(function () {
+      document.getElementById('booking-error').style.display = 'block';
+      document.getElementById('booking-success').style.display = 'none';
+    })
+    .finally(function () {
+      btn.disabled = false;
+      btn.textContent = 'Prenota il tuo tavolo →';
     });
-
-  document.getElementById('booking-success').style.display = 'flex';
-  document.getElementById('booking-error').style.display   = 'none';
-
-  btn.disabled    = false;
-  btn.textContent = 'Prenota il tuo tavolo →';
 }
