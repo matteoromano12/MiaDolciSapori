@@ -1,40 +1,120 @@
 var API_URL = 'https://miafood-api.matteoriserva0411.workers.dev';
 
+/* =============================================
+   COOKIE CONSENT — Google Maps
+   ============================================= */
+var COOKIE_KEY = 'mds_maps_consent'; // chiave localStorage
+
+/**
+ * Legge il consenso salvato:
+ *   'accepted' | 'rejected' | null (non ancora scelto)
+ */
+function getConsent() {
+  return localStorage.getItem(COOKIE_KEY);
+}
+
+/** Mostra l'iframe Maps, nasconde il placeholder */
+function loadMap() {
+  var iframe = document.getElementById('map-iframe');
+  var placeholder = document.getElementById('map-placeholder');
+  if (!iframe) return;
+  if (!iframe.src) {
+    // Inietta il vero src solo ora — prima non carica nulla
+    iframe.src = iframe.getAttribute('data-src');
+  }
+  iframe.style.display = 'block';
+  if (placeholder) placeholder.style.display = 'none';
+}
+
+/** Chiamata quando l'utente clicca "Accetta tutto" */
+function acceptCookies() {
+  localStorage.setItem(COOKIE_KEY, 'accepted');
+  hideBanner();
+  loadMap();
+}
+
+/** Chiamata quando l'utente clicca "Rifiuta" */
+function rejectCookies() {
+  localStorage.setItem(COOKIE_KEY, 'rejected');
+  hideBanner();
+}
+
+function hideBanner() {
+  var banner = document.getElementById('cookie-banner');
+  if (banner) {
+    banner.style.animation = 'none';
+    banner.style.transition = 'opacity .25s';
+    banner.style.opacity = '0';
+    setTimeout(function() { banner.style.display = 'none'; }, 260);
+  }
+}
+
+function showBanner() {
+  var banner = document.getElementById('cookie-banner');
+  if (banner) banner.style.display = 'block';
+}
+
+/** Inizializza lo stato al caricamento della pagina */
+(function initCookieConsent() {
+  var consent = getConsent();
+  if (consent === 'accepted') {
+    // Già accettato: carica la mappa subito, niente banner
+    window.addEventListener('DOMContentLoaded', loadMap);
+  } else if (consent === 'rejected') {
+    // Già rifiutato: non mostrare banner né mappa
+    // (placeholder rimane visibile di default)
+  } else {
+    // Prima visita: mostra il banner dopo un breve ritardo
+    window.addEventListener('DOMContentLoaded', function() {
+      setTimeout(showBanner, 600);
+    });
+  }
+})();
+
+/* =============================================
+   SCROLL REVEAL
+   ============================================= */
 (function () {
-  const els = document.querySelectorAll('.reveal');
+  var els = document.querySelectorAll('.reveal');
   if (!('IntersectionObserver' in window)) {
-    els.forEach(el => el.classList.add('visible'));
+    els.forEach(function(el) { el.classList.add('visible'); });
     return;
   }
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
+  var io = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
       if (entry.isIntersecting) {
         entry.target.classList.add('visible');
         io.unobserve(entry.target);
       }
     });
   }, { threshold: 0.12 });
-  els.forEach(el => io.observe(el));
+  els.forEach(function(el) { io.observe(el); });
 })();
 
+/* =============================================
+   ACTIVE NAV LINK
+   ============================================= */
 (function () {
-  const sections = document.querySelectorAll('section[id]');
-  const navLinks = document.querySelectorAll('nav a');
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
+  var sections = document.querySelectorAll('section[id]');
+  var navLinks = document.querySelectorAll('nav a');
+  var io = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
       if (entry.isIntersecting) {
-        navLinks.forEach(a => a.style.color = '');
-        const active = document.querySelector('nav a[href="#' + entry.target.id + '"]');
+        navLinks.forEach(function(a) { a.style.color = ''; });
+        var active = document.querySelector('nav a[href="#' + entry.target.id + '"]');
         if (active) active.style.color = 'var(--red)';
       }
     });
   }, { rootMargin: '-40% 0px -55% 0px' });
-  sections.forEach(s => io.observe(s));
+  sections.forEach(function(s) { io.observe(s); });
 })();
 
-document.querySelectorAll('a[href^="#"]').forEach(a => {
+/* =============================================
+   SMOOTH SCROLL
+   ============================================= */
+document.querySelectorAll('a[href^="#"]').forEach(function(a) {
   a.addEventListener('click', function (e) {
-    const target = document.querySelector(this.getAttribute('href'));
+    var target = document.querySelector(this.getAttribute('href'));
     if (target) {
       e.preventDefault();
       target.scrollIntoView({ behavior: 'smooth' });
@@ -42,6 +122,9 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
   });
 });
 
+/* =============================================
+   DATE MIN
+   ============================================= */
 (function () {
   var dateInput = document.getElementById('b-date');
   if (dateInput) {
@@ -49,6 +132,9 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
   }
 })();
 
+/* =============================================
+   BOOKING FORM
+   ============================================= */
 function submitBooking() {
   var name   = (document.getElementById('b-name').value   || '').trim();
   var phone  = (document.getElementById('b-phone').value  || '').trim();

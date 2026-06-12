@@ -582,14 +582,42 @@
           >💬 WhatsApp</a>
         </div>
       </div>
-      <div class="map-wrap reveal">
+
+      <!-- MAPPA: placeholder o iframe a seconda del consenso -->
+      <div class="map-wrap reveal" id="map-container">
+
+        <!-- Placeholder mostrato PRIMA del consenso -->
+        <div class="map-placeholder" id="map-placeholder">
+          <div class="map-placeholder-inner">
+            <div class="map-placeholder-icon">🗺️</div>
+            <p class="map-placeholder-title">Mappa non caricata</p>
+            <p class="map-placeholder-desc">
+              Google Maps usa cookie di terze parti.<br>
+              Accetta i cookie per visualizzare la mappa interattiva.
+            </p>
+            <button class="btn btn-primary map-placeholder-btn" onclick="acceptCookies()">
+              Accetta e mostra la mappa
+            </button>
+            <a
+              href="https://www.google.com/maps/dir/?api=1&destination=Via+L.+Cadorna+26+Fagnano+Olona+VA"
+              target="_blank"
+              rel="noopener"
+              class="map-placeholder-link"
+            >Apri su Google Maps →</a>
+          </div>
+        </div>
+
+        <!-- Iframe caricato SOLO dopo il consenso (src iniettato via JS) -->
         <iframe
+          id="map-iframe"
           title="Mappa MIA DOLCI SAPORI Fagnano Olona"
-          src="https://www.google.com/maps?q=Via+L.+Cadorna+26,+21054+Fagnano+Olona+VA&output=embed"
+          data-src="https://www.google.com/maps?q=Via+L.+Cadorna+26,+21054+Fagnano+Olona+VA&output=embed"
           loading="lazy"
           referrerpolicy="no-referrer-when-downgrade"
           allowfullscreen
+          style="display:none;"
         ></iframe>
+
       </div>
     </div>
   </div>
@@ -618,7 +646,7 @@
     </div>
     <div class="footer-copy">
       © 2026 MIA DOLCI SAPORI. Tutti i diritti riservati.<br>
-      <a href="admin.html">Area Amministrativa</a>
+      <a href="privacy.html">Privacy Policy</a>
     </div>
   </div>
 </footer>
@@ -632,6 +660,25 @@
     class="btn btn-wa-mob"
   >💬 WhatsApp</a>
 </div>
+
+<!-- ===== COOKIE BANNER ===== -->
+<div id="cookie-banner" class="cookie-banner" role="dialog" aria-label="Consenso cookie" style="display:none;">
+  <div class="cookie-banner-inner">
+    <div class="cookie-banner-text">
+      <strong>🍪 Questo sito usa cookie di terze parti</strong>
+      <p>
+        Utilizziamo <strong>Google Maps</strong> per mostrarti dove siamo. Questo servizio può impostare cookie di profilazione.
+        Leggi la nostra <a href="privacy.html">Privacy Policy</a>.
+      </p>
+    </div>
+    <div class="cookie-banner-actions">
+      <button class="btn cookie-btn-reject" onclick="rejectCookies()">Rifiuta</button>
+      <button class="btn cookie-btn-accept" onclick="acceptCookies()">Accetta tutto</button>
+    </div>
+  </div>
+</div>
+<!-- ========================= -->
+
 <script src="js/app.js"></script>
 </body>
 </html>
