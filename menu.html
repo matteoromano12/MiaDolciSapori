@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Menu Pizze — MIA DOLCI SAPORI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #FDFAF6; color: #1C1C1C; }
+    a { color: #C8321A; }
+
+    header {
+      background: #1C1C1C; padding: 1.25rem 1.5rem;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .logo { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: #FDFAF6; }
+    .logo span { color: #C8321A; }
+    header a { color: rgba(253,250,246,.6); font-size: .85rem; margin-left: auto; text-decoration: none; }
+    header a:hover { color: #FDFAF6; }
+
+    .page { max-width: 900px; margin-inline: auto; padding: 3rem 1.5rem 5rem; }
+
+    h1 { font-family: 'Playfair Display', serif; font-size: clamp(2rem,5vw,3rem); color: #1C1C1C; }
+    h1 span { color: #C8321A; }
+    .subtitle { margin-top: .5rem; color: rgba(28,28,28,.55); font-size: .9rem; }
+
+    /* filtro */
+    .search-bar {
+      margin: 2rem 0 1.5rem;
+      display: flex; gap: .75rem; flex-wrap: wrap; align-items: center;
+    }
+    .search-bar input {
+      flex: 1; min-width: 200px;
+      padding: .65rem 1rem; border: 1.5px solid #E5DDD0; border-radius: 100px;
+      font-family: inherit; font-size: .95rem; background: #fff; outline: none;
+    }
+    .search-bar input:focus { border-color: #C8321A; }
+    .filter-btns { display: flex; gap: .5rem; flex-wrap: wrap; }
+    .filter-btn {
+      padding: .45rem 1rem; border-radius: 100px; border: 1.5px solid #E5DDD0;
+      background: #fff; font-size: .8rem; font-weight: 600; cursor: pointer;
+      transition: all .15s;
+    }
+    .filter-btn.active, .filter-btn:hover { background: #C8321A; color: #fff; border-color: #C8321A; }
+
+    /* header colonne */
+    .col-header {
+      display: grid; grid-template-columns: 1fr 80px 90px;
+      padding: .5rem 1rem .5rem 1.25rem;
+      background: #1C1C1C; color: #FDFAF6; border-radius: .5rem .5rem 0 0;
+      font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em;
+      margin-top: 2rem;
+    }
+    .col-header span:not(:first-child) { text-align: right; }
+
+    /* righe */
+    .menu-list { list-style: none; }
+    .menu-item {
+      display: grid; grid-template-columns: 1fr 80px 90px;
+      align-items: baseline; gap: .25rem;
+      padding: .9rem 1rem .9rem 1.25rem;
+      border-bottom: 1px solid #E5DDD0;
+      background: #fff;
+      transition: background .15s;
+    }
+    .menu-item:last-child { border-bottom: none; border-radius: 0 0 .5rem .5rem; }
+    .menu-item:hover { background: #F5F0E8; }
+    .menu-item.hidden { display: none; }
+
+    .item-name { font-weight: 700; font-size: .97rem; color: #1C1C1C; }
+    .item-desc { font-size: .8rem; color: rgba(28,28,28,.55); margin-top: .15rem; line-height: 1.4; }
+    .price { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1rem; color: #C8321A; text-align: right; }
+
+    /* extra section */
+    .extras-title {
+      margin-top: 3rem; margin-bottom: .75rem;
+      font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700;
+    }
+    .extras-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: .75rem;
+    }
+    .extra-card {
+      background: #fff; border: 1px solid #E5DDD0; border-radius: .75rem;
+      padding: .9rem 1.1rem;
+    }
+    .extra-name { font-weight: 700; font-size: .9rem; color: #1C1C1C; }
+    .extra-price { font-size: .85rem; color: #C8321A; font-weight: 600; margin-top: .2rem; }
+
+    /* teglia banner */
+    .teglia-banner {
+      margin-top: 2.5rem; background: #C8321A; color: #fff;
+      border-radius: 1rem; padding: 1.5rem 2rem;
+    }
+    .teglia-banner h2 { font-family: 'Playfair Display', serif; font-size: 1.3rem; margin-bottom: .75rem; }
+    .teglia-grid { display: flex; gap: 2rem; flex-wrap: wrap; }
+    .teglia-item strong { display: block; font-size: 1.1rem; }
+    .teglia-item span { font-size: .85rem; opacity: .85; }
+
+    .no-results { padding: 2rem; text-align: center; color: rgba(28,28,28,.45); font-style: italic; }
+
+    footer { text-align: center; padding: 2rem 1rem; font-size: .8rem; color: rgba(28,28,28,.45); border-top: 1px solid #E5DDD0; margin-top: 3rem; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">MIA D<span>O</span>LCI SAPORI</div>
+  <a href="index.html">← Torna al sito</a>
+</header>
+
+<div class="page">
+  <h1>Menu <span>Pizze</span></h1>
+  <p class="subtitle">Forno a legna · Normale e Formato Famiglia · Impasti speciali disponibili</p>
+
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="🔍  Cerca una pizza o ingrediente..." oninput="filterMenu()"/>
+    <div class="filter-btns">
+      <button class="filter-btn active" onclick="filterTag('all', this)">Tutte</button>
+      <button class="filter-btn" onclick="filterTag('vegetariana', this)">🥦 Vegetariane</button>
+      <button class="filter-btn" onclick="filterTag('mare', this)">🐟 Di mare</button>
+      <button class="filter-btn" onclick="filterTag('piccante', this)">🌶 Piccanti</button>
+    </div>
+  </div>
+
+  <div class="col-header">
+    <span>Pizza</span><span style="text-align:right">Normale</span><span style="text-align:right">Famiglia</span>
+  </div>
+
+  <ul class="menu-list" id="menuList">
+    <!-- A -->
+    <li class="menu-item" data-tags="carne">
+      <div><div class="item-name">AMERICANA</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, patatine fritte, wurstel</div></div>
+      <div class="price">€ 7,00</div><div class="price">€ 17,50</div>
+    </li>
+    <!-- B -->
+    <li class="menu-item" data-tags="vegetariana bianca">
+      <div><div class="item-name">BIANCANEVE</div><div class="item-desc">Mozz. Cigno</div></div>
+      <div class="price">€ 4,50</div><div class="price">€ 12,00</div>
+    </li>
+    <li class="menu-item" data-tags="carne funghi">
+      <div><div class="item-name">BOSCAIOLA</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, porcini trifolati, salsiccia</div></div>
+      <div class="price">€ 8,00</div><div class="price">€ 20,00</div>
+    </li>
+    <li class="menu-item" data-tags="carne">
+      <div><div class="item-name">BRESAOLA E RUCOLA</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, bresaola, rucola</div></div>
+      <div class="price">€ 7,50</div><div class="price">€ 18,50</div>
+    </li>
+    <li class="menu-item" data-tags="">
+      <div><div class="item-name">BUFALINA</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, mozz. di bufala DOP (dopo cottura)</div></div>
+      <div class="price">€ 8,50</div><div class="price">€ 21,00</div>
+    </li>
+    <!-- C -->
+    <li class="menu-item" data-tags="mare">
+      <div><div class="item-name">CALAMARI</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, calamari fritti</div></div>
+      <div class="price">€ 6,50</div><div class="price">€ 20,00</div>
+    </li>
+    <li class="menu-item" data-tags="carne calzone">
+      <div><div class="item-name">CALZONE FARCITO</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, prosciutto cotto, carciofi, champignon</div></div>
+      <div class="price">€ 6,00</div><div class="price">€ 20,00</div>
+    </li>
+    <li class="menu-item" data-tags="carne calzone">
+      <div><div class="item-name">CALZONE LISCIO</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, prosciutto cotto</div></div>
+      <div class="price">€ 8,50</div><div class="price">€ 21,00</div>
+    </li>
+    <li class="menu-item" data-tags="carne">
+      <div><div class="item-name">CAMPANIA</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, salsiccia, cime di rapa, brie</div></div>
+      <div class="price">€ 8,00</div><div class="price">€ 20,00</div>
+    </li>
+    <li class="menu-item" data-tags="carne">
+      <div><div class="item-name">CANTI</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, pancetta, asparagi, grana in cottura</div></div>
+      <div class="price">€ 7,50</div><div class="price">€ 18,50</div>
+    </li>
+    <li class="menu-item" data-tags="carne">
+      <div><div class="item-name">CAPRICCIOSA</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, prosc. cotto, champignon, carciofi, olive, acciughe</div></div>
+      <div class="price">€ 7,50</div><div class="price">€ 18,50</div>
+    </li>
+    <li class="menu-item" data-tags="carne">
+      <div><div class="item-name">CARBONARA</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, pancetta, uova, grana in cottura</div></div>
+      <div class="price">€ 8,00</div><div class="price">€ 20,00</div>
+    </li>
+    <li class="menu-item" data-tags="mare">
+      <div><div class="item-name">CONCHIGLIA</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, tonno evo, gamberetti, salamoia</div></div>
+      <div class="price">€ 8,00</div><div class="price">€ 20,00</div>
+    </li>
+    <li class="menu-item" data-tags="carne piccante">
+      <div><div class="item-name">CONTADINA</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, salsiccia, salame piccante, peperoni, olive</div></div>
+      <div class="price">€ 7,00</div><div class="price">€ 17,50</div>
+    </li>
+    <li class="menu-item" data-tags="carne">
+      <div><div class="item-name">COTTO TALEGGIO</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, prosciutto cotto, taleggio</div></div>
+      <div class="price">€ 7,50</div><div class="price">€ 18,50</div>
+    </li>
+    <li class="menu-item" data-tags="carne">
+      <div><div class="item-name">CRUDO</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, prosc. crudo di Parma</div></div>
+      <div class="price">€ 6,00</div><div class="price">€ 15,00</div>
+    </li>
+    <!-- D -->
+    <li class="menu-item" data-tags="carne piccante">
+      <div><div class="item-name">DELLA CASA</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, salame piccante, zola, porcini, rucola</div></div>
+      <div class="price">€ 8,00</div><div class="price">€ 20,00</div>
+    </li>
+    <li class="menu-item" data-tags="carne piccante">
+      <div><div class="item-name">DIAVOLA</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, salame piccante</div></div>
+      <div class="price">€ 6,00</div><div class="price">€ 15,00</div>
+    </li>
+    <!-- F -->
+    <li class="menu-item" data-tags="mare">
+      <div><div class="item-name">FRUTTI DI MARE</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, cozze, calamari, vongole, gamberetti</div></div>
+      <div class="price">€ 7,50</div><div class="price">€ 18,50</div>
+    </li>
+    <!-- G -->
+    <li class="menu-item" data-tags="mare">
+      <div><div class="item-name">GAMBERETTI E RUCOLA</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, gamberetti, rucola</div></div>
+      <div class="price">€ 7,50</div><div class="price">€ 18,50</div>
+    </li>
+    <li class="menu-item" data-tags="vegetariana">
+      <div><div class="item-name">GOLOSA</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, zola, zucchine, speck</div></div>
+      <div class="price">€ 8,50</div><div class="price">€ 21,00</div>
+    </li>
+    <li class="menu-item" data-tags="carne">
+      <div><div class="item-name">GUSTO</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, salsiccia, scamorza</div></div>
+      <div class="price">€ 7,00</div><div class="price">€ 20,00</div>
+    </li>
+    <!-- I -->
+    <li class="menu-item" data-tags="vegetariana">
+      <div><div class="item-name">ITALIA</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, rucola, pomodorini, grana</div></div>
+      <div class="price">€ 7,50</div><div class="price">€ 18,50</div>
+    </li>
+    <!-- J -->
+    <li class="menu-item" data-tags="mare">
+      <div><div class="item-name">JOLLY</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, mozz. di bufala, pomodorini, rucola, scaglie di grana</div></div>
+      <div class="price">€ 8,00</div><div class="price">€ 20,00</div>
+    </li>
+    <!-- M -->
+    <li class="menu-item" data-tags="vegetariana">
+      <div><div class="item-name">MARGHERITA</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno</div></div>
+      <div class="price">€ 5,00</div><div class="price">€ 13,00</div>
+    </li>
+    <li class="menu-item" data-tags="mare funghi">
+      <div><div class="item-name">MARI E MONTI</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, gamberetti, porcini trifolati</div></div>
+      <div class="price">€ 8,50</div><div class="price">€ 21,00</div>
+    </li>
+    <li class="menu-item" data-tags="vegetariana">
+      <div><div class="item-name">MARINARA</div><div class="item-desc">Pomodoro Mutti, aglio, olio evo, origano</div></div>
+      <div class="price">€ 4,00</div><div class="price">€ 10,00</div>
+    </li>
+    <li class="menu-item" data-tags="vegetariana">
+      <div><div class="item-name">MEDITERRANEA</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, melanzane, olive, pomodorini, origano, peperoni</div></div>
+      <div class="price">€ 8,00</div><div class="price">€ 20,00</div>
+    </li>
+    <li class="menu-item" data-tags="carne piccante">
+      <div><div class="item-name">MESSICANA</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, fagioli, salame piccante, cipolla, olive</div></div>
+      <div class="price">€ 7,50</div><div class="price">€ 18,50</div>
+    </li>
+    <li class="menu-item" data-tags="carne">
+      <div><div class="item-name">MEZZALUNA</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, prosciutto cotto, prosciutto crudo Parma, scaglie di grana</div></div>
+      <div class="price">€ 7,50</div><div class="price">€ 18,50</div>
+    </li>
+    <li class="menu-item" data-tags="carne">
+      <div><div class="item-name">MIA</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, burrata, prosc. crudo Parma, grana, pomodorini freschi</div></div>
+      <div class="price">€ 9,00</div><div class="price">€ 22,00</div>
+    </li>
+    <li class="menu-item" data-tags="carne piccante funghi">
+      <div><div class="item-name">MISTER CAMPIONE</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, salame piccante, salsiccia, champignon</div></div>
+      <div class="price">€ 7,50</div><div class="price">€ 18,50</div>
+    </li>
+    <li class="menu-item" data-tags="carne piccante">
+      <div><div class="item-name">MIX</div><div class="item-desc">Pom. Mutti, mozz. Cigno, prosciutto cotto, salame piccante, panna, gorgonzola, olive</div></div>
+      <div class="price">€ 8,00</div><div class="price">€ 20,00</div>
+    </li>
+    <li class="menu-item" data-tags="carne piccante">
+      <div><div class="item-name">MOSCOVA</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, salame piccante, peperoni, rucola</div></div>
+      <div class="price">€ 6,00</div><div class="price">€ 14,00</div>
+    </li>
+    <!-- N -->
+    <li class="menu-item" data-tags="mare">
+      <div><div class="item-name">NAPOLI</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, origano, acciughe</div></div>
+      <div class="price">€ 8,00</div><div class="price">€ 20,00</div>
+    </li>
+    <!-- O -->
+    <li class="menu-item" data-tags="vegetariana">
+      <div><div class="item-name">ORTOLANA</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, melanzane, zucchine, radicchio</div></div>
+      <div class="price">€ 7,50</div><div class="price">€ 19,00</div>
+    </li>
+    <li class="menu-item" data-tags="carne piccante">
+      <div><div class="item-name">OSCAR</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, salame piccante, zola, zucchine</div></div>
+      <div class="price">€ 7,00</div><div class="price">€ 17,50</div>
+    </li>
+    <!-- P -->
+    <li class="menu-item" data-tags="carne">
+      <div><div class="item-name">PAESANA</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, pancetta, grana</div></div>
+      <div class="price">€ 8,00</div><div class="price">€ 20,00</div>
+    </li>
+    <li class="menu-item" data-tags="carne">
+      <div><div class="item-name">PARMA</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, prosciutto crudo di Parma, scaglie di grana</div></div>
+      <div class="price">€ 6,50</div><div class="price">€ 16,00</div>
+    </li>
+    <li class="menu-item" data-tags="vegetariana">
+      <div><div class="item-name">PARMIGGIANA</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, melanzana, grana in cottura</div></div>
+      <div class="price">€ 8,00</div><div class="price">€ 20,00</div>
+    </li>
+    <li class="menu-item" data-tags="carne funghi">
+      <div><div class="item-name">PASTORELLA</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, porcini trifolati, scamorza affumicata, pancetta</div></div>
+      <div class="price">€ 7,00</div><div class="price">€ 17,50</div>
+    </li>
+    <li class="menu-item" data-tags="funghi">
+      <div><div class="item-name">PORCINI</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, porcini trifolati</div></div>
+      <div class="price">€ 8,50</div><div class="price">€ 21,00</div>
+    </li>
+    <li class="menu-item" data-tags="vegetariana">
+      <div><div class="item-name">PRIMAVERA</div><div class="item-desc">Pom. Mutti, mozz. Cigno, rucola, pomodorini, scaglie di grana, burrata</div></div>
+      <div class="price">€ 6,00</div><div class="price">€ 15,00</div>
+    </li>
+    <li class="menu-item" data-tags="carne">
+      <div><div class="item-name">PROSCIUTTO</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, prosciutto cotto</div></div>
+      <div class="price">€ 6,50</div><div class="price">€ 16,00</div>
+    </li>
+    <li class="menu-item" data-tags="carne funghi">
+      <div><div class="item-name">PROSCIUTTO E FUNGHI</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, prosciutto cotto, funghi</div></div>
+      <div class="price">€ 7,00</div><div class="price">€ 17,50</div>
+    </li>
+    <!-- Q -->
+    <li class="menu-item" data-tags="vegetariana">
+      <div><div class="item-name">QUATTRO FORMAGGI</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, grana, fontina, zola</div></div>
+      <div class="price">€ 7,50</div><div class="price">€ 18,50</div>
+    </li>
+    <li class="menu-item" data-tags="carne funghi">
+      <div><div class="item-name">QUATTRO STAGIONI</div><div class="item-desc">Pom. Mutti, mozz. Cigno, prosciutto cotto, carciofi, champignon, olive</div></div>
+      <div class="price">€ 7,50</div><div class="price">€ 18,50</div>
+    </li>
+    <!-- R -->
+    <li class="menu-item" data-tags="vegetariana">
+      <div><div class="item-name">RADICCHIO E SCAMORZA</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, radicchio, scamorza affumicata</div></div>
+      <div class="price">€ 6,50</div><div class="price">€ 16,00</div>
+    </li>
+    <li class="menu-item" data-tags="carne">
+      <div><div class="item-name">RAPA</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, pancetta, grana, cime di rapa</div></div>
+      <div class="price">€ 8,00</div><div class="price">€ 20,00</div>
+    </li>
+    <li class="menu-item" data-tags="mare">
+      <div><div class="item-name">ROMANA</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, capperi, acciughe, olive, origano</div></div>
+      <div class="price">€ 6,00</div><div class="price">€ 15,00</div>
+    </li>
+    <!-- S -->
+    <li class="menu-item" data-tags="carne">
+      <div><div class="item-name">SALSICCIA E FRIARIELLI</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, salsiccia, friarielli</div></div>
+      <div class="price">€ 8,00</div><div class="price">€ 20,00</div>
+    </li>
+    <li class="menu-item" data-tags="carne">
+      <div><div class="item-name">SALSICCIA E PATATE</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, salsiccia, patate fritte</div></div>
+      <div class="price">€ 8,00</div><div class="price">€ 20,00</div>
+    </li>
+    <li class="menu-item" data-tags="carne">
+      <div><div class="item-name">SAN ROCCO</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, salsiccia, cipolle, fagioli</div></div>
+      <div class="price">€ 7,50</div><div class="price">€ 18,50</div>
+    </li>
+    <li class="menu-item" data-tags="carne piccante mare">
+      <div><div class="item-name">SAPORE</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, scamorza affumicata, salame piccante, acciughe</div></div>
+      <div class="price">€ 7,50</div><div class="price">€ 18,50</div>
+    </li>
+    <li class="menu-item" data-tags="carne">
+      <div><div class="item-name">SPECK E BRIE</div><div class="item-desc">Pomodoro Mutti, mozz. Cigno, speck, brie</div></div>
+      <div class="price">€ 7,50</div><div class="price">€ 18,50</div>
+    </li>
+    <li class="menu-item" data-tags="carne">
+      <div><div class="item-name">STELLA</div><div class="item-desc">Pomodoro Mutti, mozzarella Cigno, salsiccia, zucchine, grana in cottura</div></div>
+      <div class="price">€ 8,00</div><div class="price">€ 20,00</div>
+    </li>
+    <li class="menu-item" data-tags="mare">
+      <div><div class="item-name">STELLA MIA</div><div class="item-desc">Pomodoro Mutti, mozzarella Cigno, polpo, gamberetti, zucchine</div></div>
+      <div class="price">€ 8,50</div><div class="price">€ 24,00</div>
+    </li>
+    <li class="menu-item" data-tags="carne piccante">
+      <div><div class="item-name">SUPER DIAVOLA</div><div class="item-desc">Pomodoro Mutti, mozzarella Cigno, salame piccante, peperoncino fresco</div></div>
+      <div class="price">€ 7,00</div><div class="price">€ 17,50</div>
+    </li>
+    <li class="menu-item" data-tags="vegetariana mare">
+      <div><div class="item-name">SUPER PUGLIESE</div><div class="item-desc">Pomodoro Mutti, mozzarella Cigno, cipolla, peperoni, origano, olive</div></div>
+      <div class="price">€ 7,50</div><div class="price">€ 18,50</div>
+    </li>
+    <!-- T -->
+    <li class="menu-item" data-tags="carne">
+      <div><div class="item-name">TIROLESE</div><div class="item-desc">Pomodoro Mutti, mozzarella Cigno, speck, fontina</div></div>
+      <div class="price">€ 7,50</div><div class="price">€ 18,50</div>
+    </li>
+    <li class="menu-item" data-tags="mare">
+      <div><div class="item-name">TONNO E CIPOLLA</div><div class="item-desc">Pomodoro Mutti, mozzarella Cigno, tonno evo, cipolla</div></div>
+      <div class="price">€ 6,00</div><div class="price">€ 15,00</div>
+    </li>
+    <li class="menu-item" data-tags="carne bianca">
+      <div><div class="item-name">TROPEA</div><div class="item-desc">Mozzarella Cigno, pancetta, cipolla rossa di Tropea, scamorza</div></div>
+      <div class="price">€ 8,00</div><div class="price">€ 20,00</div>
+    </li>
+    <!-- V -->
+    <li class="menu-item" data-tags="carne">
+      <div><div class="item-name">VALTELLINA</div><div class="item-desc">Pomodoro Mutti, mozzarella Cigno, bresaola, brie, porcini trifolati, rucola</div></div>
+      <div class="price">€ 8,50</div><div class="price">€ 21,00</div>
+    </li>
+    <li class="menu-item" data-tags="vegetariana">
+      <div><div class="item-name">VEGETARIANA</div><div class="item-desc">Pomodoro Mutti, mozzarella Cigno, verdure grigliate</div></div>
+      <div class="price">€ 7,00</div><div class="price">€ 17,50</div>
+    </li>
+    <li class="menu-item" data-tags="carne">
+      <div><div class="item-name">VENUS</div><div class="item-desc">Pomodoro Mutti, mozzarella Cigno, speck, zola, radicchio</div></div>
+      <div class="price">€ 8,00</div><div class="price">€ 20,00</div>
+    </li>
+    <!-- W -->
+    <li class="menu-item" data-tags="carne">
+      <div><div class="item-name">WURSTEL</div><div class="item-desc">Pomodoro Mutti, mozzarella Cigno, wurstel</div></div>
+      <div class="price">€ 6,00</div><div class="price">€ 15,00</div>
+    </li>
+    <!-- Z -->
+    <li class="menu-item" data-tags="carne piccante funghi">
+      <div><div class="item-name">ZINGARA</div><div class="item-desc">Pomodoro Mutti, mozzarella Cigno, funghi champignon, peperoni, salame piccante, cipolla</div></div>
+      <div class="price">€ 8,00</div><div class="price">€ 20,00</div>
+    </li>
+    <li class="menu-item" data-tags="vegetariana bianca">
+      <div><div class="item-name">ZOLA E MELE</div><div class="item-desc">Mozzarella Cigno, mele, zola</div></div>
+      <div class="price">€ 7,00</div><div class="price">€ 17,50</div>
+    </li>
+  </ul>
+  <div class="no-results" id="noResults" style="display:none;">Nessuna pizza trovata 🍕</div>
+
+  <!-- EXTRA -->
+  <h2 class="extras-title">Aggiunte &amp; Varianti</h2>
+  <div class="extras-grid">
+    <div class="extra-card">
+      <div class="extra-name">Pinsa Romana</div>
+      <div class="extra-price">+ € 2,00</div>
+    </div>
+    <div class="extra-card">
+      <div class="extra-name">Impasto Tradizionale Integrale</div>
+      <div class="extra-price">Normale + € 1,00 &nbsp;·&nbsp; Famiglia + € 4,00</div>
+    </div>
+    <div class="extra-card">
+      <div class="extra-name">Impasto Senza Glutine</div>
+      <div class="extra-price">+ € 3,00</div>
+    </div>
+    <div class="extra-card">
+      <div class="extra-name">Bufala</div>
+      <div class="extra-price">Normale + € 2,00 &nbsp;·&nbsp; Famiglia + € 4,00</div>
+    </div>
+    <div class="extra-card">
+      <div class="extra-name">Doppia Mozzarella</div>
+      <div class="extra-price">Normale + € 1,50 &nbsp;·&nbsp; Famiglia + € 2,50</div>
+    </div>
+  </div>
+
+  <!-- TEGLIA -->
+  <div class="teglia-banner">
+    <h2>🍕 Pizza in Teglia 40×60 cm — Su Prenotazione</h2>
+    <div class="teglia-grid">
+      <div class="teglia-item">
+        <strong>€ 20,00</strong>
+        <span>Teglia Margherita</span>
+      </div>
+      <div class="teglia-item">
+        <strong>€ 25,00</strong>
+        <span>Teglia Farcita</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  © 2026 MIA DOLCI SAPORI · Via L. Cadorna 26, Fagnano Olona (VA) · 0331 1552818 ·
+  <a href="index.html">Torna al sito</a>
+</footer>
+
+<script>
+  var activeTag = 'all';
+
+  function filterMenu() {
+    var q = document.getElementById('searchInput').value.toLowerCase();
+    var items = document.querySelectorAll('.menu-item');
+    var visible = 0;
+    items.forEach(function(item) {
+      var text = item.textContent.toLowerCase();
+      var tags = item.getAttribute('data-tags') || '';
+      var matchSearch = !q || text.includes(q);
+      var matchTag = activeTag === 'all' || tags.includes(activeTag);
+      if (matchSearch && matchTag) { item.classList.remove('hidden'); visible++; }
+      else { item.classList.add('hidden'); }
+    });
+    document.getElementById('noResults').style.display = visible === 0 ? 'block' : 'none';
+  }
+
+  function filterTag(tag, btn) {
+    activeTag = tag;
+    document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    filterMenu();
+  }
+</script>
+</body>
+</html>
